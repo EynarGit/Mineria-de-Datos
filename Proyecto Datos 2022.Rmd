@@ -1,0 +1,115 @@
+library(tidyverse)
+library(arules)
+library(ggplot2)
+library(haven)
+library(rpart)
+library(rpart.plot)
+
+#Carga de Datos 2022
+
+```{r}
+Datos2022 <-  read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/20230919232405QL4dMFKDwxMZkfk1gTiHClmLsdYdyRgL.sav")
+Data2022 <-  Datos2022 %>%
+  select(Depreg, Sexo, Edadif, Caudef)
+```
+#Limpieza y evaluacion de datos
+
+```{r}
+subset(Data2022, is.na(Data2022$Depreg))
+subset(Data2022, is.na(Data2022$Sexo))
+subset(Data2022, is.na(Data2022$Edadif))
+subset(Data2022, is.na(Data2022$Caudef))
+```
+```{r}
+Data2022 %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif))
+```
+```{r}
+Data2022Clean <- Data2022%>%
+  subset(Edadif<999)
+Data2022Clean %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+```
+
+#Analisis Inicial
+```{r}
+MuertesXDep2022 <- Data2022Clean %>%
+  count(Depreg)
+CausasMuerte2022 <- Data2022Clean %>%
+   count(Caudef)
+EdadMuerte2022 <- Data2022Clean %>%
+  count(Edadif)
+```
+#Grafico de Muertes x Departamento 2022
+
+```{r}
+ggplot(MuertesXDep2022, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+```
+#Grafico de causas Principales de Muerte 2022
+
+```{r}
+ggplot(subset(CausasMuerte2022,n>1000)) + geom_point(aes(x = Caudef , y= n))
+```
+#Grafico de Edad de Muerte 2014
+
+```{r}
+
+ggplot(EdadMuerte2022 + geom_line(aes(x=Edadif,y=n)))
+       
+```
+
+
+```{r}
+boxplot(Data2022Clean$Edadif ~ Data2022Clean$Sexo,last=1, col="darkorchid1",
+ylab="Edad de Muerte", xlab ="Sexo")
+```
+#Analsis usando Kmeans
+
+```{r}
+cluster1 <- kmeans(Data2022Clean, centers=2)
+```
+#Analisis usando Arbol
+
+```{r}
+
+Prediccion2022 <- rpart(Caudef ~ Edadif, data=Data2022Clean, method = "class")
+
+rpart.plot(Prediccion2022,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Causa defuncion 2022",
+           cex = 0.6)  
+
+```
+
+#Prediccion 2
+
+```{r}
+
+Prediccion2_2022 <- rpart(Caudef ~ Depreg, data=Data2022Clean, method = "class")
+rpart.plot(Prediccion2_2022,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Departamento año 2022",
+           cex = 0.6)  
+```
+
+#Prediccion 3
+
+```{r}
+Prediccion3_2022 <- rpart(Caudef ~ Sexo, data=Data2022Clean, method = "class")
+rpart.plot(Prediccion3_2022,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Sexo año 2022",
+           cex = 0.6)  
+```

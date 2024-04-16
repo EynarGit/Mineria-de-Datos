@@ -1,0 +1,115 @@
+library(tidyverse)
+library(arules)
+library(ggplot2)
+library(haven)
+library(rpart)
+library(rpart.plot)
+
+#Carga de Datos 2018
+
+```{r}
+Datos2018 <- read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/201911291520069Odm3oxU9mTY58hkborwzylm7MJop05q.sav")
+Data2018 <-  Datos2018 %>%
+  select(Depreg, Sexo, Edadif, Caudef)
+```
+#Limpieza y evaluacion de datos
+
+```{r}
+subset(Data2018, is.na(Data2018$Depreg))
+subset(Data2018, is.na(Data2018$Sexo))
+subset(Data2018, is.na(Data2018$Edadif))
+subset(Data2018, is.na(Data2018$Caudef))
+```
+```{r}
+Data2018 %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif))
+```
+```{r}
+Data2018Clean <- Data2018%>%
+  subset(Edadif<999)
+Data2018Clean %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+```
+
+#Analisis Inicial
+```{r}
+MuertesXDep2018 <- Data2018Clean %>%
+  count(Depreg)
+CausasMuerte2018 <- Data2018Clean %>%
+   count(Caudef)
+EdadMuerte2018 <- Data2018Clean %>%
+  count(Edadif)
+```
+#Grafico de Muertes x Departamento 2018
+
+```{r}
+ggplot(MuertesXDep2018, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+```
+#Grafico de causas Principales de Muerte 2018
+
+```{r}
+ggplot(subset(CausasMuerte2018,n>1000)) + geom_point(aes(x = Caudef , y= n))
+```
+#Grafico de Edad de Muerte 2018
+
+```{r}
+
+ggplot(EdadMuerte2018 + geom_line(aes(x=Edadif,y=n)))
+       
+```
+
+
+```{r}
+boxplot(Data2018Clean$Edadif ~ Data2018Clean$Sexo,last=1, col="darkorchid1",
+ylab="Edad de Muerte", xlab ="Sexo", Main = "Defunciones 2018")
+```
+#Analsis usando Kmeans
+
+```{r}
+cluster1 <- kmeans(Data2018Clean, centers=2)
+```
+#Analisis usando Arbol
+
+```{r}
+
+Prediccion2018 <- rpart(Caudef ~ Edadif, data=Data2018Clean, method = "class")
+
+rpart.plot(Prediccion2018,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Causa defuncion 2018",
+           cex = 0.6)  
+
+```
+
+#Prediccion 2
+
+```{r}
+Prediccion2_2018 <- rpart(Caudef ~ Depreg, data=Data2018Clean, method = "class")
+rpart.plot(Prediccion2_2018,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Departamento año 2018",
+           cex = 0.6)  
+```
+#Prediccion 3
+
+```{r}
+Prediccion3_2018 <- rpart(Caudef ~ Sexo, data=Data2018Clean, method = "class")
+rpart.plot(Prediccion3_2018,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Edad y Sexo año 2018",
+           cex = 0.6)  
+```
+
+

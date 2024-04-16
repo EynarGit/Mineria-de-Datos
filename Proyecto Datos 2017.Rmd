@@ -1,0 +1,143 @@
+library(tidyverse)
+library(arules)
+library(ggplot2)
+library(haven)
+library(rpart)
+library(rpart.plot)
+
+#Carga de Datos 2017
+
+```{r}
+Datos2017 <- read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/20181226142907xRp35JuZin7nN2x88Me8MVcQvyZCnu5K.sav")
+Data2017 <-  Datos2017 %>%
+  select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
+Data2017<- na.omit(Data2017)
+
+```
+#Limpieza y evaluacion de datos
+
+```{r}
+subset(Data2017, is.na(Data2017$Depreg))
+subset(Data2017, is.na(Data2017$Sexo))
+subset(Data2017, is.na(Data2017$Edadif))
+subset(Data2017, is.na(Data2017$Caudef))
+subset(Data2017, is.na(Data2017$Asist))
+subset(Data2017, is.na(Data2017$Cerdef))
+```
+```{r}
+Data2017 %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif))
+```
+```{r}
+Data2017Clean <- Data2017%>%
+  subset(Edadif<999)
+Data2017Clean %>%
+     summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+```
+
+#Analisis Inicial
+```{r}
+MuertesXDep2017 <- Data2017Clean %>%
+  count(Depreg)
+CausasMuerte2017 <- Data2017Clean %>%
+   count(Caudef)
+EdadMuerte2017 <- Data2017Clean %>%
+  count(Edadif)
+```
+#Grafico de Muertes x Departamento 2017
+
+```{r}
+ggplot(MuertesXDep2017, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+```
+#Grafico de causas Principales de Muerte 2017
+
+```{r}
+ggplot(subset(CausasMuerte2017,n>1000)) + geom_point(aes(x = Caudef , y= n))
+```
+#Grafico de Edad de Muerte 2017
+
+```{r}
+
+ggplot(EdadMuerte2017, aes(x= Edadif, y=n) + geom_bar())
+       
+```
+
+
+```{r}
+boxplot(Data2017Clean$Edadif ~ Data2017Clean$Sexo,last=1, col="darkorchid1",
+ylab="Edad de Muerte", xlab ="Sexo", Main = "Defunciones 2017")
+```
+#Analisis usando Apriori
+
+```{r}
+Apriori2017 <- fim4r(Data2017Clean, method="fpgrowth", targert="rules", supp=.2,conf=.5)
+FrameApriori2017 <- as(Apriori2017,"data.frame")
+```
+
+
+#Analsis usando Kmeans
+
+```{r}
+cluster2017 <- kmeans(Data2017Clean, centers=4)
+```
+
+
+
+
+#Analisis usando Arbol
+
+```{r}
+
+Prediccion2017 <- rpart(Caudef ~ Edadif, data=Data2017Clean, method = "class")
+
+rpart.plot(Prediccion2017,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Causa defuncion 2017",
+           cex = 0.6)  
+
+```
+
+#Prediccion 2
+
+```{r}
+Prediccion2_2017 <- rpart(Caudef ~ Depreg, data=Data2017Clean, method = "class")
+rpart.plot(Prediccion2_2017,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Departamento año 2017",
+           cex = 0.6)  
+```
+#Prediccion 3
+
+```{r}
+Prediccion3_2017 <- rpart(Caudef ~ Sexo, data=Data2017Clean, method = "class")
+rpart.plot(Prediccion3_2017,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por Sexo año 2017",
+           cex = 0.6)  
+```
+#Prediccion 4
+
+```{r}
+Prediccion4_2017 <- rpart(Caudef ~ Cerdef, data=Data2017Clean, method = "class")
+rpart.plot(Prediccion4_2017,
+           type = 2,
+           extra = 0,  
+           under = TRUE,  
+           fallen.leaves = TRUE,  
+           box.palette = "BuGn",  
+           main = "Arbol Causas de defuncion por quien certifica año 2017",
+           cex = 0.6)  
+```
+
