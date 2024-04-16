@@ -11,8 +11,19 @@ library(rpart.plot)
 Datos2017 <- read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/20181226142907xRp35JuZin7nN2x88Me8MVcQvyZCnu5K.sav")
 Data2017 <-  Datos2017 %>%
   select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
-Data2017<- na.omit(Data2017)
-
+Data2017[is.na(Data2017)] <- -1
+MaxDepreg<- max(Data2017$Depreg)
+MaxSexo<- max(Data2017$Sexo)
+MaxEdadif<- max(Data2017$Edadif)
+MaxCaudef<- max(Data2017$Caudef)
+MaxAsist<- max(Data2017$Asist)
+MaxCerdef<- max(Data2017$Cerdef)
+MinDepreg<- min(Data2017$Depreg)
+MinSexo<- min(Data2017$Sexo)
+MinEdadif<- min(Data2017$Edadif)
+MinCaudef<- min(Data2017$Caudef)
+MinAsist<- min(Data2017$Asist)
+MinCerdef<- min(Data2017$Cerdef)
 ```
 #Limpieza y evaluacion de datos
 
@@ -30,7 +41,7 @@ Data2017 %>%
 ```
 ```{r}
 Data2017Clean <- Data2017%>%
-  subset(Edadif<999)
+  subset(Edadif<999 & Edadif>0)
 Data2017Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
 ```
