@@ -84,7 +84,7 @@ ggplot(EdadMuerte2017) + geom_point(aes(Edadif,n)) + ggtitle("Falleciemientos po
 
 ```{r}
 boxplot(Data2017Clean$Edadif ~ Data2017Clean$Sexo,last=1, col="darkorchid1",
-ylab="Edad de Muerte", xlab ="Sexo", Main = "Defunciones 2017")
+ylab="Edad de Muerte", xlab ="Sexo 1 = Hombres 2 = Mujeres Año 2017")
 ```
 #Analisis usando Apriori
 

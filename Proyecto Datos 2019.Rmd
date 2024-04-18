@@ -68,7 +68,7 @@ ggplot(EdadMuerte2019) + geom_point(aes(Edadif,n)) + ggtitle("Fallecimientos por
 
 ```{r}
 boxplot(Data2019Clean$Edadif ~ Data2019Clean$Sexo,last=1, col="darkorchid1",
-ylab="Edad de Muerte", xlab ="Sexo", Main = "Defunciones 2019")
+ylab="Edad de Muerte", xlab ="Sexo 1 = Hombres 2 = Mujeres 2019")
 ```
 #Analsis usando Kmeans
 
