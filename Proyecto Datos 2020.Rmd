@@ -10,7 +10,7 @@ library(rpart.plot)
 ```{r}
 Datos2020 <- read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/20210930225530FopQpWf6BcBWj8taVS3Q3mRKxgDsvwPe.sav")
 Data2020 <-  Datos2020 %>%
-  select(Depreg, Sexo, Edadif, Caudef)
+  select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
 ```
 #Limpieza y evaluacion de datos
 
@@ -19,6 +19,8 @@ subset(Data2020, is.na(Data2020$Depreg))
 subset(Data2020, is.na(Data2020$Sexo))
 subset(Data2020, is.na(Data2020$Edadif))
 subset(Data2020, is.na(Data2020$Caudef))
+subset(Data2019, is.na(Data2019$Asist))
+subset(Data2019, is.na(Data2019$Cerdef))
 ```
 ```{r}
 Data2020 %>%
@@ -27,8 +29,9 @@ Data2020 %>%
 ```{r}
 Data2020Clean <- Data2020%>%
   subset(Edadif<999)
-Data2020Clean %>%
+Año2020 <- Data2020Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+Año2020
 ```
 
 #Analisis Inicial
@@ -43,18 +46,25 @@ EdadMuerte2020 <- Data2020Clean %>%
 #Grafico de Muertes x Departamento 2020
 
 ```{r}
-ggplot(MuertesXDep2020, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+ggplot(MuertesXDep2020, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2020")
 ```
+# Departamentos con mas de 5000 Muertes
+```{r}
+ggplot(subset(MuertesXDep2020,n>5000), aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2020")
+```
+
+
 #Grafico de causas Principales de Muerte 2020
 
 ```{r}
-ggplot(subset(CausasMuerte2020,n>1000)) + geom_point(aes(x = Caudef , y= n))
+ggplot(subset(CausasMuerte2020,n>5000)) + geom_point(aes(x = Caudef , y= n))+ ggtitle("Causas Principales de Muerte 2020")
 ```
-#Grafico de Edad de Muerte 2014
+#Grafico de Edad de Muerte 2020
 
 ```{r}
 
-ggplot(EdadMuerte2020 + geom_line(aes(x=Edadif,y=n)))
+ggplot(EdadMuerte2020) + geom_point(aes(Edadif,n)) + ggtitle("Fallecimientos por Edad Año 2020")
+       
        
 ```
 

@@ -10,7 +10,7 @@ library(rpart.plot)
 ```{r}
 Datos2022 <-  read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/20230919232405QL4dMFKDwxMZkfk1gTiHClmLsdYdyRgL.sav")
 Data2022 <-  Datos2022 %>%
-  select(Depreg, Sexo, Edadif, Caudef)
+  select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
 ```
 #Limpieza y evaluacion de datos
 
@@ -19,6 +19,8 @@ subset(Data2022, is.na(Data2022$Depreg))
 subset(Data2022, is.na(Data2022$Sexo))
 subset(Data2022, is.na(Data2022$Edadif))
 subset(Data2022, is.na(Data2022$Caudef))
+subset(Data2022, is.na(Data2022$Asist))
+subset(Data2022, is.na(Data2022$Cerdef))
 ```
 ```{r}
 Data2022 %>%
@@ -27,8 +29,9 @@ Data2022 %>%
 ```{r}
 Data2022Clean <- Data2022%>%
   subset(Edadif<999)
-Data2022Clean %>%
+Año2022 <- Data2022Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+Año2022
 ```
 
 #Analisis Inicial
@@ -41,20 +44,32 @@ EdadMuerte2022 <- Data2022Clean %>%
   count(Edadif)
 ```
 #Grafico de Muertes x Departamento 2022
+```{r}
+ggplot(MuertesXDep2022, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2022")
+```
+
+
+
+
+
+
+
+
+# Departamentos con mas de 5000 Muertes
 
 ```{r}
-ggplot(MuertesXDep2022, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+ggplot(subset(MuertesXDep2022,n>5000), aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2022")
 ```
 #Grafico de causas Principales de Muerte 2022
 
 ```{r}
-ggplot(subset(CausasMuerte2022,n>1000)) + geom_point(aes(x = Caudef , y= n))
+ggplot(subset(CausasMuerte2022,n>5000)) + geom_point(aes(x = Caudef , y= n)) + ggtitle("Causas Principales de Muerte 2022")
 ```
-#Grafico de Edad de Muerte 2014
+#Grafico de Edad de Muerte 2022
 
 ```{r}
 
-ggplot(EdadMuerte2022 + geom_line(aes(x=Edadif,y=n)))
+ggplot(EdadMuerte2021) + geom_point(aes(Edadif,n)) + ggtitle("Fallecimientos por Edad Año 2022")
        
 ```
 

@@ -10,7 +10,7 @@ library(rpart.plot)
 ```{r}
 Datos2018 <- read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/201911291520069Odm3oxU9mTY58hkborwzylm7MJop05q.sav")
 Data2018 <-  Datos2018 %>%
-  select(Depreg, Sexo, Edadif, Caudef)
+  select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
 ```
 #Limpieza y evaluacion de datos
 
@@ -19,6 +19,8 @@ subset(Data2018, is.na(Data2018$Depreg))
 subset(Data2018, is.na(Data2018$Sexo))
 subset(Data2018, is.na(Data2018$Edadif))
 subset(Data2018, is.na(Data2018$Caudef))
+subset(Data2018, is.na(Data2018$Asist))
+subset(Data2018, is.na(Data2018$Cerdef))
 ```
 ```{r}
 Data2018 %>%
@@ -27,8 +29,9 @@ Data2018 %>%
 ```{r}
 Data2018Clean <- Data2018%>%
   subset(Edadif<999)
-Data2018Clean %>%
+Año2018 <- Data2018Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+Año2018
 ```
 
 #Analisis Inicial
@@ -43,18 +46,25 @@ EdadMuerte2018 <- Data2018Clean %>%
 #Grafico de Muertes x Departamento 2018
 
 ```{r}
-ggplot(MuertesXDep2018, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+ggplot(MuertesXDep2018, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2018")
 ```
+# Departamentos con mas de 5000 Muertes
+```{r}
+ggplot(subset(MuertesXDep2018,n>5000), aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2018")
+```
+
+
+
 #Grafico de causas Principales de Muerte 2018
 
 ```{r}
-ggplot(subset(CausasMuerte2018,n>1000)) + geom_point(aes(x = Caudef , y= n))
+ggplot(subset(CausasMuerte2018,n>3000)) + geom_point(aes(x = Caudef , y= n)) + ggtitle("Causas Principales de Muerte 2018")
 ```
 #Grafico de Edad de Muerte 2018
 
 ```{r}
 
-ggplot(EdadMuerte2018 + geom_line(aes(x=Edadif,y=n)))
+ggplot(EdadMuerte2018) + geom_point(aes(Edadif,n)) + ggtitle("Fallecimientos por Edad Año 2018")
        
 ```
 

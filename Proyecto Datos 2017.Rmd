@@ -42,8 +42,9 @@ Data2017 %>%
 ```{r}
 Data2017Clean <- Data2017%>%
   subset(Edadif<999 & Edadif>0)
-Data2017Clean %>%
+Año2017 <- Data2017Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+Año2017
 ```
 
 #Analisis Inicial
@@ -58,18 +59,25 @@ EdadMuerte2017 <- Data2017Clean %>%
 #Grafico de Muertes x Departamento 2017
 
 ```{r}
-ggplot(MuertesXDep2017, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+ggplot(MuertesXDep2017, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2017")
 ```
+# Departamentos con mas de 5000 Muertes
+```{r}
+ggplot(subset(MuertesXDep2017,n>5000), aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2017")
+```
+
+
+
 #Grafico de causas Principales de Muerte 2017
 
 ```{r}
-ggplot(subset(CausasMuerte2017,n>1000)) + geom_point(aes(x = Caudef , y= n))
+ggplot(subset(CausasMuerte2017,n>3000)) + geom_point(aes(x = Caudef , y= n))+ ggtitle("Causas Principales de Muerte 2017")
 ```
 #Grafico de Edad de Muerte 2017
 
 ```{r}
 
-ggplot(EdadMuerte2017, aes(x= Edadif, y=n) + geom_bar())
+ggplot(EdadMuerte2017) + geom_point(aes(Edadif,n)) + ggtitle("Falleciemientos por Edad Año 2017")
        
 ```
 

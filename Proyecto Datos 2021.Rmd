@@ -10,7 +10,7 @@ library(rpart.plot)
 ```{r}
 Datos2021 <-  read_sav("C:/Users/erodriguez/OneDrive - COFIÑO STAHL Y CIA, S.A/Documents/Personal Data/Maestira USAC/Cuarto Trimestre/Introduccion a la Mineria de Datos/Proyecto/202209291705496fk7sP4nOpg1KDOZ2RqxKFu9EXG3ONsf.sav")
 Data2021 <-  Datos2021 %>%
-  select(Depreg, Sexo, Edadif, Caudef)
+  select(Depreg, Sexo, Edadif, Caudef,Asist,Cerdef)
 ```
 #Limpieza y evaluacion de datos
 
@@ -19,6 +19,8 @@ subset(Data2021, is.na(Data2021$Depreg))
 subset(Data2021, is.na(Data2021$Sexo))
 subset(Data2021, is.na(Data2021$Edadif))
 subset(Data2021, is.na(Data2021$Caudef))
+subset(Data2021, is.na(Data2021$Asist))
+subset(Data2021, is.na(Data2021$Cerdef))
 ```
 ```{r}
 Data2021 %>%
@@ -27,8 +29,9 @@ Data2021 %>%
 ```{r}
 Data2021Clean <- Data2021%>%
   subset(Edadif<999)
-Data2021Clean %>%
+Año2021 <- Data2021Clean %>%
      summarise(EdadMin = min(Edadif), Edadmax=max(Edadif), EdadProm = mean(Edadif), EdadMedia = median(Edadif))
+Año2021
 ```
 
 #Analisis Inicial
@@ -43,18 +46,26 @@ EdadMuerte2021 <- Data2021Clean %>%
 #Grafico de Muertes x Departamento 2021
 
 ```{r}
-ggplot(MuertesXDep2021, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") 
+ggplot(MuertesXDep2021, aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2021")
 ```
+# Departamentos con mas de 5000 Muertes
+```{r}
+ggplot(subset(MuertesXDep2021,n>5000), aes(x = Depreg , y= n)) + geom_bar(stat="identity", fill="red", alpha=.6, width=.4) + labs(x="Departamento",y= "Frecuencia") + ggtitle("Fallecimientos por departamento Año 2021")
+```
+
+
+
+
 #Grafico de causas Principales de Muerte 2021
 
 ```{r}
-ggplot(subset(CausasMuerte2021,n>1000)) + geom_point(aes(x = Caudef , y= n))
+ggplot(subset(CausasMuerte2021,n>5000)) + geom_point(aes(x = Caudef , y= n)) + ggtitle("Causas Principales de Muerte 2021")
 ```
 #Grafico de Edad de Muerte 2021
 
 ```{r}
 
-ggplot(EdadMuerte2021 + geom_line(aes(x=Edadif,y=n)))
+ggplot(EdadMuerte2021) + geom_point(aes(Edadif,n)) + ggtitle("Fallecimientos por Edad Año 2021")
        
 ```
 
